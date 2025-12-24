@@ -21,14 +21,16 @@ const AppNavbar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link onClick={() => navigate('/')}>Home</Nav.Link>
+            <Nav.Link onClick={() => navigate('/')}>🏠 Home</Nav.Link>
+            {user && <Nav.Link onClick={() => navigate('/chat')}>💬 Chat</Nav.Link>}
+            {user && <Nav.Link onClick={() => navigate('/order-history')}>📦 Order History</Nav.Link>}
             {user?.role === 'shopkeeper' && (
               <Nav.Link onClick={() => navigate('/cart')}>
-                Cart {cart.length > 0 && <Badge bg="danger">{cart.length}</Badge>}
+                🛒 Cart {cart.length > 0 && <Badge bg="danger">{cart.length}</Badge>}
               </Nav.Link>
             )}
-            {user?.role === 'vendor' && <Nav.Link onClick={() => navigate('/dashboard')}>Dashboard</Nav.Link>}
-            {user?.role === 'admin' && <Nav.Link onClick={() => navigate('/admin')}>Admin Panel</Nav.Link>}
+            {user?.role === 'vendor' && <Nav.Link onClick={() => navigate('/dashboard')}>📊 Dashboard</Nav.Link>}
+            {user?.role === 'admin' && <Nav.Link onClick={() => navigate('/admin')}>⚙️ Admin Panel</Nav.Link>}
           </Nav>
           <Nav>
             {user ? (

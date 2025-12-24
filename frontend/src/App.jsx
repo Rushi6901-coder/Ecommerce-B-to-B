@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AppNavbar from './components/common/Navbar';
 import Home from './components/common/Home';
 import LoginPage from './components/common/LoginPage';
+import Chat from './components/common/Chat';
+import OrderHistory from './components/common/OrderHistory';
 import Cart from './components/shopkeeper/Cart';
 import VendorDashboard from './components/vendor/VendorDashboard';
 import AdminPanel from './components/admin/AdminPanel';
@@ -62,6 +64,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/order-history" element={<OrderHistory />} />
               <Route 
                 path="/cart" 
                 element={
