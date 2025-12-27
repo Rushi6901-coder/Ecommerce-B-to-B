@@ -4,6 +4,7 @@ import { categories } from '../../data/demoData';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import LoginModal from '../common/LoginModal';
+import ProductCard from '../common/ProductCard';
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -95,25 +96,7 @@ const Home = () => {
       <Row className="g-4">
         {selectedSubcategory.products.map(product => (
           <Col xs={12} sm={6} md={4} lg={3} key={product.id}>
-            <Card className="h-100 shadow-sm hover-card">
-              <Card.Body className="d-flex flex-column">
-                <Card.Title className="h5">{product.name}</Card.Title>
-                <Card.Text className="text-muted small flex-grow-1">{product.description}</Card.Text>
-                <div className="mt-auto">
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span className="h5 text-success mb-0">₹{product.price.toLocaleString()}</span>
-                  </div>
-                  <small className="text-muted d-block mb-2">Vendor: {product.vendor}</small>
-                  <Button 
-                    variant="success" 
-                    className="w-100"
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-              </Card.Body>
-            </Card>
+            <ProductCard product={product} />
           </Col>
         ))}
       </Row>
