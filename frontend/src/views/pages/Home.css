@@ -1,0 +1,41 @@
+.home-container {
+  min-height: calc(100vh - 56px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.category-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.category-icon {
+  font-size: 3rem;
+}
+
+.stats-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pills .nav-link {
+  border-radius: 20px;
+  margin: 0 5px;
+}
+
+.nav-pills .nav-link.active {
+  background: linear-gradient(135deg, #22d3ee, #2563eb);
+}

@@ -7,12 +7,14 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
+  const [registeredUsers, setRegisteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Load user from localStorage on app start
   useEffect(() => {
     const savedUser = localStorage.getItem('b2b_user');
     const savedCart = localStorage.getItem('b2b_cart');
+    const savedUsers = localStorage.getItem('b2b_registered_users');
     
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -20,12 +22,26 @@ export const AuthProvider = ({ children }) => {
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
+    if (savedUsers) {
+      setRegisteredUsers(JSON.parse(savedUsers));
+    }
     setLoading(false);
   }, []);
 
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('b2b_user', JSON.stringify(userData));
+  };
+
+  const register = (userData) => {
+    const newUsers = [...registeredUsers, userData];
+    setRegisteredUsers(newUsers);
+    localStorage.setItem('b2b_registered_users', JSON.stringify(newUsers));
+    login(userData);
+  };
+
+  const findUser = (email) => {
+    return registeredUsers.find(u => u.email === email);
   };
 
   const logout = () => {
@@ -67,7 +83,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, login, logout, cart, addToCart, removeFromCart, updateCartQuantity
+      user, login, register, findUser, logout, cart, addToCart, removeFromCart, updateCartQuantity
     }}>
       {children}
     </AuthContext.Provider>
