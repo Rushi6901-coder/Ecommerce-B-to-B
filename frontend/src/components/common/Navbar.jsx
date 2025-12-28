@@ -13,41 +13,94 @@ const AppNavbar = () => {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+    <Navbar expand="lg" sticky="top" className="glass-navbar">
       <Container fluid>
-        <Navbar.Brand onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
+        {/* Brand */}
+        <Navbar.Brand
+          className="brand-text"
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer' }}
+        >
           B2B Commerce
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link onClick={() => navigate('/')}>🏠 Home</Nav.Link>
-            {user && <Nav.Link onClick={() => navigate('/chat')}>💬 Chat</Nav.Link>}
-            {user && <Nav.Link onClick={() => navigate('/order-history')}>📦 Order History</Nav.Link>}
-            {user?.role === 'shopkeeper' && (
-              <Nav.Link onClick={() => navigate('/cart')}>
-                🛒 Cart {cart.length > 0 && <Badge bg="danger">{cart.length}</Badge>}
+
+        <Navbar.Toggle aria-controls="main-navbar" />
+        <Navbar.Collapse id="main-navbar">
+          {/* LEFT MENU */}
+          <Nav className="me-auto nav-links">
+            <Nav.Link onClick={() => navigate('/')} className="force-black">Home</Nav.Link>
+            <Nav.Link onClick={() => navigate('/contact')} className="force-black">Contact</Nav.Link>
+
+            {user && (
+              <Nav.Link onClick={() => navigate('/chat')} className="force-black">Chat</Nav.Link>
+            )}
+
+            {user && (
+              <Nav.Link onClick={() => navigate('/order-history')} className="force-black">
+                Orders
               </Nav.Link>
             )}
-            {user?.role === 'vendor' && <Nav.Link onClick={() => navigate('/dashboard')}>📊 Dashboard</Nav.Link>}
-            {user?.role === 'admin' && <Nav.Link onClick={() => navigate('/admin')}>⚙️ Admin Panel</Nav.Link>}
+
+            {user?.role === 'shopkeeper' && (
+              <Nav.Link onClick={() => navigate('/cart')} className="force-black">
+                Cart{' '}
+                {cart.length > 0 && (
+                  <Badge pill bg="danger" className="ms-1">
+                    {cart.length}
+                  </Badge>
+                )}
+              </Nav.Link>
+            )}
+
+            {user?.role === 'vendor' && (
+              <Nav.Link onClick={() => navigate('/dashboard')} className="force-black">
+                Dashboard
+              </Nav.Link>
+            )}
+
+            {user?.role === 'admin' && (
+              <Nav.Link onClick={() => navigate('/admin')} className="force-black">
+                Admin Panel
+              </Nav.Link>
+            )}
           </Nav>
-          <Nav>
+
+          {/* RIGHT MENU */}
+          <Nav className="align-items-center">
             {user ? (
               <>
-                <Navbar.Text className="me-3">
-                  <span className={`badge bg-${
-                    user.role === 'admin' ? 'danger' : 
-                    user.role === 'vendor' ? 'warning' : 'info'
-                  } me-2`}>
-                    {user.role}
-                  </span>
+                <span
+                  className={`role-badge me-2 ${
+                    user.role === 'admin'
+                      ? 'role-admin'
+                      : user.role === 'vendor'
+                      ? 'role-vendor'
+                      : 'role-shop'
+                  }`}
+                >
+                  {user.role.toUpperCase()}
+                </span>
+
+                <span className="username-text me-3">
                   {user.name}
-                </Navbar.Text>
-                <Button variant="outline-light" size="sm" onClick={handleLogout}>Logout</Button>
+                </span>
+
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
               </>
             ) : (
-              <Button variant="outline-light" size="sm" onClick={() => navigate('/login')}>Login</Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </Button>
             )}
           </Nav>
         </Navbar.Collapse>

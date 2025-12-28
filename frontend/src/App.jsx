@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AppNavbar from './components/common/Navbar';
-import Home from './components/common/Home';
+import Footer from './components/common/Footer';
+
+// New MVC Pages
+import HomePage from './views/pages/HomePage';
+import ContactPage from './views/pages/ContactPage';
+import CategoryPage from './views/pages/CategoryPage';
+import AllProductsPage from './views/pages/AllProductsPage';
+
+// Legacy components (to be migrated)
 import LoginPage from './components/common/LoginPage';
 import Chat from './components/common/Chat';
 import OrderHistory from './components/common/OrderHistory';
@@ -13,6 +21,7 @@ import LoginModal from './components/common/LoginModal';
 import { ToastContainer } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
+import './theme.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -58,11 +67,14 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App" style={{ minHeight: '100vh', width: '100vw', overflow: 'hidden' }}>
+        <div className="App" style={{ minHeight: '100vh', width: '100vw', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <AppNavbar />
-          <div style={{ minHeight: 'calc(100vh - 56px)', width: '100%' }}>
+          <div style={{ flex: '1', width: '100%' }}>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/products" element={<AllProductsPage />} />
+              <Route path="/category/:categoryId" element={<CategoryPage />} />
+              <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/order-history" element={<OrderHistory />} />
@@ -93,6 +105,7 @@ function App() {
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
+          <Footer />
           <ToastContainer 
             position="top-right" 
             autoClose={3000}

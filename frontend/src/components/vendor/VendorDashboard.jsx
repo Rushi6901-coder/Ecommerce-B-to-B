@@ -76,7 +76,7 @@ const VendorDashboard = () => {
   const selectedCategory = categories.find(c => c.id === parseInt(newProduct.category));
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div className="page-container">
       <Container fluid className="py-4">
         <Row className="mb-4">
           <Col>

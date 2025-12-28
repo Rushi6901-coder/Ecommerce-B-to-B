@@ -1,84 +1,56 @@
+import './ProductCard.css';
+
 import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
-import { useAuth } from '../../context/AuthContext';
 
-const ProductCard = ({ product }) => {
-  const { addToCart, user } = useAuth();
-
-  const handleAddToCart = () => {
-    addToCart(product);
-  };
-
+const ProductCard = ({ product, onAddToCart }) => {
   return (
-    <Card className="h-100 shadow-sm position-relative">
-      {/* Discount Badge */}
-      {product.discount > 0 && (
-        <Badge 
-          bg="danger" 
-          className="position-absolute top-0 end-0 m-2"
-          style={{ zIndex: 1, fontSize: '0.8rem' }}
-        >
-          {product.discount}% OFF
-        </Badge>
-      )}
-      
-      {/* Product Image */}
-      <div style={{ height: '200px', overflow: 'hidden' }}>
+    <Card className="product-card h-100">
+      {product.image && (
         <Card.Img 
           variant="top" 
           src={product.image} 
           alt={product.name}
-          style={{ 
-            height: '100%', 
-            width: '100%', 
-            objectFit: 'cover',
-            transition: 'transform 0.3s ease'
-          }}
-          onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-          onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          style={{ height: '200px', objectFit: 'cover' }}
         />
-      </div>
-      
+      )}
       <Card.Body className="d-flex flex-column">
-        <Card.Title className="h6">{product.name}</Card.Title>
-        <Card.Text className="text-muted small flex-grow-1">
+        <Card.Title className="text-center">
+          {product.name}
+        </Card.Title>
+
+        <p className="text-muted text-center mb-2">
           {product.description}
-        </Card.Text>
-        
-        {/* Price Section */}
-        <div className="mb-2">
-          <div className="d-flex align-items-center gap-2">
-            <span className="h5 text-success mb-0">₹{product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <span className="text-muted text-decoration-line-through small">
-                ₹{product.originalPrice.toLocaleString()}
-              </span>
-            )}
-          </div>
-          <small className="text-muted">by {product.vendor}</small>
+        </p>
+
+        <div className="text-center mb-2">
+          {product.originalPrice && (
+            <small className="text-muted text-decoration-line-through me-2">
+              ₹{product.originalPrice.toLocaleString()}
+            </small>
+          )}
+          <h5 className="text-success d-inline">
+            ₹{product.price.toLocaleString()}
+          </h5>
+          {product.discount && (
+            <Badge bg="danger" className="ms-2">
+              {product.discount}% OFF
+            </Badge>
+          )}
         </div>
-        
-        {/* Action Button */}
-        {user?.role === 'shopkeeper' && (
-          <Button 
-            variant="primary" 
-            size="sm" 
-            onClick={handleAddToCart}
-            className="mt-auto"
-          >
-            🛒 Add to Cart
-          </Button>
+
+        {product.stock < 10 && (
+          <Badge bg="warning" className="mx-auto my-2">
+            Low Stock
+          </Badge>
         )}
-        
-        {user?.role === 'vendor' && (
-          <Button 
-            variant="outline-primary" 
-            size="sm"
-            className="mt-auto"
-          >
-            ✏️ Edit Product
-          </Button>
-        )}
+
+        <Button
+          className="mt-auto add-cart-btn"
+          onClick={onAddToCart}
+        >
+          🛒 Add to Cart
+        </Button>
       </Card.Body>
     </Card>
   );
