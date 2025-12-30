@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form, Table, Badge, ListGroup, InputGroup, Nav } from 'react-bootstrap';
-import { categories } from '../../data/demoData';
+import { useAuth } from '../../context/AuthContext';
+import { API_ENDPOINTS } from '../../config/api';
 import { toast } from 'react-toastify';
 import VendorProductManager from './VendorProductManager';
 
 const VendorDashboard = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([
     { id: 1, shopkeeper: 'John Doe', items: 2, total: 154998, status: 'Pending', date: '2024-01-15' },
     { id: 2, shopkeeper: 'Mike Johnson', items: 1, total: 79999, status: 'Confirmed', date: '2024-01-14' }
   ]);
-  
+
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -31,7 +34,7 @@ const VendorDashboard = () => {
       status: 'delivered'
     }
   ]);
-  
+
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [editingEstimation, setEditingEstimation] = useState(null);
@@ -40,34 +43,90 @@ const VendorDashboard = () => {
     price: '',
     description: '',
     category: '',
-    subcategory: ''
+    subcategory: '',
+    stock: 100
   });
 
-  const handleAddProduct = () => {
-    if (newProduct.name && newProduct.price && newProduct.category) {
-      const categoryName = categories.find(c => c.id === parseInt(newProduct.category))?.name || '';
-      const subcategoryName = categories
-        .find(c => c.id === parseInt(newProduct.category))
-        ?.subcategories.find(s => s.id === parseInt(newProduct.subcategory))?.name || '';
-      
-      setProducts(prev => [...prev, {
-        ...newProduct,
-        id: Date.now(),
+  useEffect(() => {
+    fetchCategories();
+    if (user?.id) {
+      fetchProducts();
+    }
+  }, [user]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.categories);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length <= 1) { // Seed if empty or only the test category
+          console.log('Categories empty, triggering seed...');
+          await fetch(`${API_ENDPOINTS.categories.replace('AdminCategory', 'Seed')}/categories`, {
+            method: 'POST'
+          });
+          // Re-fetch after seed
+          const retryRes = await fetch(API_ENDPOINTS.categories);
+          if (retryRes.ok) {
+            setCategories(await retryRes.json());
+          }
+        } else {
+          setCategories(data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(`${API_ENDPOINTS.vendorProducts}/${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const handleAddProduct = async () => {
+    if (newProduct.name && newProduct.price && newProduct.category && user?.id) {
+      const payload = {
+        productName: newProduct.name,
         price: parseFloat(newProduct.price),
-        categoryName,
-        subcategoryName
-      }]);
-      
-      setNewProduct({ name: '', price: '', description: '', category: '', subcategory: '' });
-      setShowAddProduct(false);
-      toast.success('Product added successfully!');
+        discount: 0,
+        stock: parseInt(newProduct.stock),
+        vendorId: user.id,
+        categoryId: parseInt(newProduct.category),
+        subCategoryId: parseInt(newProduct.subcategory)
+      };
+
+      try {
+        const response = await fetch(API_ENDPOINTS.vendorProducts, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          fetchProducts();
+          setNewProduct({ name: '', price: '', description: '', category: '', subcategory: '', stock: 100 });
+          setShowAddProduct(false);
+          toast.success('Product added successfully!');
+        } else {
+          toast.error('Failed to save product to database');
+        }
+      } catch (error) {
+        toast.error('Error connecting to server');
+      }
     } else {
       toast.error('Please fill all required fields');
     }
   };
 
   const updateOrderStatus = (orderId, status) => {
-    setOrders(prev => prev.map(order => 
+    setOrders(prev => prev.map(order =>
       order.id === orderId ? { ...order, status } : order
     ));
     toast.success(`Order ${status.toLowerCase()}!`);
@@ -83,16 +142,16 @@ const VendorDashboard = () => {
             <h2>🏪 Vendor Dashboard</h2>
             <Nav variant="tabs" className="mt-3">
               <Nav.Item>
-                <Nav.Link 
-                  active={activeTab === 'dashboard'} 
+                <Nav.Link
+                  active={activeTab === 'dashboard'}
                   onClick={() => setActiveTab('dashboard')}
                 >
                   📊 Dashboard
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link 
-                  active={activeTab === 'products'} 
+                <Nav.Link
+                  active={activeTab === 'products'}
                   onClick={() => setActiveTab('products')}
                 >
                   📦 Product Manager
@@ -101,7 +160,7 @@ const VendorDashboard = () => {
             </Nav>
           </Col>
         </Row>
-        
+
         {activeTab === 'products' ? (
           <VendorProductManager />
         ) : (
@@ -165,9 +224,9 @@ const VendorDashboard = () => {
                           </thead>
                           <tbody>
                             {products.slice(0, 5).map(product => (
-                              <tr key={product.id}>
-                                <td>{product.name}</td>
-                                <td className="text-success">₹{product.price.toLocaleString()}</td>
+                              <tr key={product.productId}>
+                                <td>{product.productName}</td>
+                                <td className="text-success">₹{(product.price || 0).toLocaleString()}</td>
                                 <td><small>{product.categoryName}</small></td>
                               </tr>
                             ))}
@@ -181,7 +240,7 @@ const VendorDashboard = () => {
                   </Card.Body>
                 </Card>
               </Col>
-              
+
               <Col lg={6}>
                 <Card className="shadow-sm">
                   <Card.Header className="bg-success text-white d-flex justify-content-between align-items-center">
@@ -213,8 +272,8 @@ const VendorDashboard = () => {
                               </td>
                               <td>
                                 {order.status === 'Pending' && (
-                                  <Button 
-                                    variant="outline-success" 
+                                  <Button
+                                    variant="outline-success"
                                     size="sm"
                                     onClick={() => updateOrderStatus(order.id, 'Confirmed')}
                                   >
@@ -248,35 +307,46 @@ const VendorDashboard = () => {
                     <Form.Control
                       type="text"
                       value={newProduct.name}
-                      onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                      onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                       placeholder="Enter product name"
                     />
                   </Form.Group>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Price *</Form.Label>
                     <Form.Control
                       type="number"
                       value={newProduct.price}
-                      onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                      placeholder="Enter price"
+                      onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                      placeholder="Price"
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Stock *</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={newProduct.stock}
+                      onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
+                      placeholder="Stock"
                     />
                   </Form.Group>
                 </Col>
               </Row>
-              
+
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Category *</Form.Label>
                     <Form.Select
                       value={newProduct.category}
-                      onChange={(e) => setNewProduct({...newProduct, category: e.target.value, subcategory: ''})}
+                      onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value, subcategory: '' })}
                     >
                       <option value="">Select Category</option>
                       {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
                       ))}
                     </Form.Select>
                   </Form.Group>
@@ -287,25 +357,25 @@ const VendorDashboard = () => {
                       <Form.Label>Subcategory</Form.Label>
                       <Form.Select
                         value={newProduct.subcategory}
-                        onChange={(e) => setNewProduct({...newProduct, subcategory: e.target.value})}
+                        onChange={(e) => setNewProduct({ ...newProduct, subcategory: e.target.value })}
                       >
                         <option value="">Select Subcategory</option>
-                        {selectedCategory.subcategories.map(sub => (
-                          <option key={sub.id} value={sub.id}>{sub.name}</option>
+                        {selectedCategory.subCategories?.map(sub => (
+                          <option key={sub.subCategoryId} value={sub.subCategoryId}>{sub.subCategoryName}</option>
                         ))}
                       </Form.Select>
                     </Form.Group>
                   )}
                 </Col>
               </Row>
-              
+
               <Form.Group className="mb-3">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
                   value={newProduct.description}
-                  onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
                   placeholder="Enter product description"
                 />
               </Form.Group>

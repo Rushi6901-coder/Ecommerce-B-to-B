@@ -12,23 +12,36 @@ export const AuthProvider = ({ children }) => {
 
   // Load user from localStorage on app start
   useEffect(() => {
-    const savedUser = localStorage.getItem('b2b_user');
-    const savedCart = localStorage.getItem('b2b_cart');
-    const savedUsers = localStorage.getItem('b2b_registered_users');
-    
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
-    if (savedUsers) {
-      setRegisteredUsers(JSON.parse(savedUsers));
+    try {
+      const savedUser = localStorage.getItem('b2b_user');
+      const savedCart = localStorage.getItem('b2b_cart');
+      const savedUsers = localStorage.getItem('b2b_registered_users');
+
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && parsedUser.role) {
+          parsedUser.role = parsedUser.role.toLowerCase();
+        }
+        setUser(parsedUser);
+      }
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+      if (savedUsers) {
+        setRegisteredUsers(JSON.parse(savedUsers));
+      }
+    } catch (error) {
+      console.error('Error loading data from localStorage:', error);
+      localStorage.removeItem('b2b_user');
+      localStorage.removeItem('b2b_cart');
     }
     setLoading(false);
   }, []);
 
   const login = (userData) => {
+    if (userData && userData.role) {
+      userData.role = userData.role.toLowerCase();
+    }
     setUser(userData);
     localStorage.setItem('b2b_user', JSON.stringify(userData));
   };
@@ -64,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateCartQuantity = (cartId, quantity) => {
-    const newCart = cart.map(item => 
+    const newCart = cart.map(item =>
       item.cartId === cartId ? { ...item, quantity } : item
     );
     setCart(newCart);

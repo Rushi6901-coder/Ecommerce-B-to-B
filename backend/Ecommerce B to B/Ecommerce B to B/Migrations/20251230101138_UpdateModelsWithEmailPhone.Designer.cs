@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce_B_to_B.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20251228071641_first")]
-    partial class first
+    [Migration("20251230101138_UpdateModelsWithEmailPhone")]
+    partial class UpdateModelsWithEmailPhone
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,6 +62,12 @@ namespace Ecommerce_B_to_B.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
@@ -91,6 +97,27 @@ namespace Ecommerce_B_to_B.Migrations
                     b.HasIndex("VendorId");
 
                     b.ToTable("ChatRooms");
+                });
+
+            modelBuilder.Entity("Ecommerce_B_to_B.Models.Location", b =>
+                {
+                    b.Property<int>("LocationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationId"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LocationId");
+
+                    b.ToTable("Locations");
                 });
 
             modelBuilder.Entity("Ecommerce_B_to_B.Models.Message", b =>
@@ -241,7 +268,28 @@ namespace Ecommerce_B_to_B.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShopkeeperId"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -250,6 +298,8 @@ namespace Ecommerce_B_to_B.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ShopkeeperId");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Shopkeepers");
                 });
@@ -264,6 +314,12 @@ namespace Ecommerce_B_to_B.Migrations
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("SubCategoryName")
                         .IsRequired()
@@ -284,7 +340,28 @@ namespace Ecommerce_B_to_B.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VendorId"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -293,6 +370,8 @@ namespace Ecommerce_B_to_B.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VendorId");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Vendors");
                 });
@@ -380,6 +459,15 @@ namespace Ecommerce_B_to_B.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("Ecommerce_B_to_B.Models.Shopkeeper", b =>
+                {
+                    b.HasOne("Ecommerce_B_to_B.Models.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.Navigation("Location");
+                });
+
             modelBuilder.Entity("Ecommerce_B_to_B.Models.SubCategory", b =>
                 {
                     b.HasOne("Ecommerce_B_to_B.Models.Category", "Category")
@@ -389,6 +477,15 @@ namespace Ecommerce_B_to_B.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Ecommerce_B_to_B.Models.Vendor", b =>
+                {
+                    b.HasOne("Ecommerce_B_to_B.Models.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Ecommerce_B_to_B.Models.Category", b =>

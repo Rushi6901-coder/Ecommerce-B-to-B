@@ -70,15 +70,14 @@ const AppNavbar = () => {
             {user ? (
               <>
                 <span
-                  className={`role-badge me-2 ${
-                    user.role === 'admin'
+                  className={`role-badge me-2 ${user.role === 'admin'
                       ? 'role-admin'
                       : user.role === 'vendor'
-                      ? 'role-vendor'
-                      : 'role-shop'
-                  }`}
+                        ? 'role-vendor'
+                        : 'role-shop'
+                    }`}
                 >
-                  {user.role.toUpperCase()}
+                  {user.role?.toUpperCase() || 'USER'}
                 </span>
 
                 <span className="username-text me-3">

@@ -16,6 +16,7 @@ namespace Ecommerce_B_to_B.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
         public DbSet<Shopkeeper> Shopkeepers { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
         // =========================
         // PRODUCT TABLES

@@ -13,8 +13,8 @@
         public decimal Discount { get; set; }
         public int Stock { get; set; }
 
-        public Vendor Vendor { get; set; }
-        public Category Category { get; set; }
-        public SubCategory SubCategory { get; set; }
+        public Vendor? Vendor { get; set; }
+        public Category? Category { get; set; }
+        public SubCategory? SubCategory { get; set; }
     }
 }

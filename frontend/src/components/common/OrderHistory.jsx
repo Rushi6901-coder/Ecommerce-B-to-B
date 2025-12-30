@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Card, Row, Col, Badge, Button, Table } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
+import './OrderHistory.css';
 
 const OrderHistory = () => {
   const { user } = useAuth();
@@ -27,78 +28,88 @@ const OrderHistory = () => {
 
   if (user?.role === 'shopkeeper') {
     return (
-      <Container className="mt-4">
-        <h2>📦 My Orders</h2>
-        <Row>
-          {shopkeeperOrders.map(order => (
-            <Col md={6} key={order.id} className="mb-3">
-              <Card>
-                <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h5>Order #{order.id}</h5>
-                    <Badge bg={getStatusColor(order.status)}>{order.status}</Badge>
-                  </div>
-                  <p className="text-muted">Date: {order.date}</p>
-                  <p>Items: {order.items} | Total: ₹{order.total}</p>
-                  <Button variant="outline-primary" size="sm">View Details</Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Container>
+      <div className="order-page-container">
+        <Container className="py-4">
+          <div className="order-header">
+            <h2>My Orders</h2>
+          </div>
+          <Row>
+            {shopkeeperOrders.map(order => (
+              <Col md={6} key={order.id} className="mb-3">
+                <Card className="order-card">
+                  <Card.Body>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <h5>Order #{order.id}</h5>
+                      <Badge bg={getStatusColor(order.status)}>{order.status}</Badge>
+                    </div>
+                    <p className="text-muted">Date: {order.date}</p>
+                    <p>Items: {order.items} | Total: ₹{order.total}</p>
+                    <Button variant="outline-primary" size="sm">View Details</Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+      </div>
     );
   }
 
   if (user?.role === 'vendor') {
     return (
-      <Container className="mt-4">
-        <h2>📋 Order Management</h2>
-        <Card>
-          <Card.Body>
-            <Table responsive hover>
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>Date</th>
-                  <th>Items</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vendorOrders.map(order => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td>{order.customer}</td>
-                    <td>{order.date}</td>
-                    <td>{order.items}</td>
-                    <td>₹{order.amount}</td>
-                    <td>
-                      <Badge bg={getStatusColor(order.status)}>{order.status}</Badge>
-                    </td>
-                    <td>
-                      <Button variant="outline-primary" size="sm">Manage</Button>
-                    </td>
+      <div className="order-page-container">
+        <Container className="py-4">
+          <div className="order-header">
+            <h2>Order Management</h2>
+          </div>
+          <Card className="order-card">
+            <Card.Body>
+              <Table responsive hover className="order-table" size="sm">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Card.Body>
-        </Card>
-      </Container>
+                </thead>
+                <tbody>
+                  {vendorOrders.map(order => (
+                    <tr key={order.id}>
+                      <td>#{order.id}</td>
+                      <td>{order.customer}</td>
+                      <td>{order.date}</td>
+                      <td>{order.items}</td>
+                      <td>₹{order.amount}</td>
+                      <td>
+                        <Badge bg={getStatusColor(order.status)}>{order.status}</Badge>
+                      </td>
+                      <td>
+                        <Button variant="outline-primary" size="sm">Manage</Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
+        </Container>
+      </div>
     );
   }
 
   return (
-    <Container className="mt-4">
-      <div className="alert alert-info text-center">
-        <h5>📦 Order History</h5>
-        <p>Order history is available for shopkeepers and vendors only.</p>
-      </div>
-    </Container>
+    <div className="order-page-container">
+      <Container className="py-4">
+        <div className="alert alert-info text-center">
+          <h5>Order History</h5>
+          <p>Order history is available for shopkeepers and vendors only.</p>
+        </div>
+      </Container>
+    </div>
   );
 };
 
