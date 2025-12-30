@@ -31,8 +31,18 @@ const AppNavbar = () => {
             <Nav.Link onClick={() => navigate('/')} className="force-black">Home</Nav.Link>
             <Nav.Link onClick={() => navigate('/contact')} className="force-black">Contact</Nav.Link>
 
-            {user && (
-              <Nav.Link onClick={() => navigate('/chat')} className="force-black">Chat</Nav.Link>
+            {(user?.role === 'shopkeeper' || user?.role === 'vendor') && (
+              <Nav.Link onClick={() => navigate('/chat')} className="force-black position-relative">
+                💬
+                <Badge 
+                  pill 
+                  bg="danger" 
+                  className="position-absolute top-0 start-100 translate-middle"
+                  style={{ fontSize: '0.6rem' }}
+                >
+                  3
+                </Badge>
+              </Nav.Link>
             )}
 
             {user && (

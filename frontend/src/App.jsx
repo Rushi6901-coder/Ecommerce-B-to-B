@@ -76,7 +76,14 @@ function App() {
               <Route path="/category/:categoryId" element={<CategoryPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/chat" element={<Chat />} />
+              <Route 
+                path="/chat" 
+                element={
+                  <ProtectedRoute allowedRoles={['shopkeeper', 'vendor']}>
+                    <Chat />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/order-history" element={<OrderHistory />} />
               <Route 
                 path="/cart" 
