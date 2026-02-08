@@ -1,6 +1,0 @@
-@Ecommerce_B_to_B_HostAddress = http://localhost:5226
-
-GET {{Ecommerce_B_to_B_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
