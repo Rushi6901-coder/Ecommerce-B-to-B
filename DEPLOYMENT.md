@@ -1,77 +1,56 @@
-# Deployment Guide for Ecommerce-B-to-B
+# 🚀 How to Make Your Project Live on Render
 
-This guide provides step-by-step instructions to deploy your full-stack application.
+This guide will help you deploy your **Spring Boot Backend** and **React Frontend** to Render.com for free.
 
-## Prerequisites
+## Phase 1: Database Setup (Railway MySQL)
 
-- **Docker** and **Docker Compose** installed on your deployment server (or local machine for testing).
-- A **MySQL Database** (can be a managed service like AWS RDS, Railway MySQL, or a Docker container).
+Since Render's free PostgreSQL doesn't work with your MySQL setup without changes, we'll use **Railway** for a free MySQL database.
 
-## Environment Variables
+1.  Go to [Railway.app](https://railway.app/) and sign up/login.
+2.  Click **"New Project"** -> **"Provision MySQL"**.
+3.  Once created, click on the **MySQL** card -> **Variables**.
+4.  Copy the following values (you will need them later):
+    - `MYSQLHOST`
+    - `MYSQLPORT`
+    - `MYSQLUSER`
+    - `MYSQLPASSWORD`
+    - `MYSQLDATABASE`
+    - Or just copy the full `DATABASE_URL` if available (it looks like `mysql://user:pass@host:port/db`).
 
-You must set the following environment variables in your deployment environment (e.g., via a `.env` file or your hosting platform's dashboard).
+## Phase 2: Backend Deployment (Render)
 
-### Backend Variables
+1.  Go to [Render.com](https://render.com/) and sign up/login.
+2.  Click **"New +"** -> **"Web Service"**.
+3.  Connect your GitHub account and select your repository: `Ecommerce-B-to-B`.
+4.  **Name**: `b2b-backend` (or similar).
+5.  **Root Directory**: `spring_boot_mvc_template` (Important!).
+6.  **Runtime**: Select **Docker**.
+7.  **Instance Type**: Select **Free**.
+8.  **Environment Variables** (Click "Add Environment Variable"):
+    - `SPRING_DATASOURCE_URL`: `jdbc:mysql://<MYSQLHOST>:<MYSQLPORT>/<MYSQLDATABASE>` (Replace with Railway values)
+    - `SPRING_DATASOURCE_USERNAME`: `<MYSQLUSER>`
+    - `SPRING_DATASOURCE_PASSWORD`: `<MYSQLPASSWORD>`
+    - `CORS_ALLOWED_ORIGINS`: `*` (We will update this to the frontend URL later)
+    - `JWT_SECRET`: `generate_a_long_random_string_here`
+9.  Click **"Create Web Service"**.
+10. Wait for the build to finish. Once it says "Live", copy the **backend URL** (e.g., `https://b2b-backend.onrender.com`).
 
-| Variable | Description | Default (if not set) |
-| :--- | :--- | :--- |
-| `SPRING_DATASOURCE_URL` | MySQL Connection URL | `jdbc:mysql://localhost:3306/B2BEcom` |
-| `SPRING_DATASOURCE_USERNAME` | Database Username | `root` |
-| `SPRING_DATASOURCE_PASSWORD` | Database Password | `cdac` |
-| `JWT_SECRET` | Secret key for JWT signing | *(Default hardcoded dev key)* |
-| `CORS_ALLOWED_ORIGINS` | Comma-separated list of allowed origins | `*` |
+## Phase 3: Frontend Deployment (Render)
 
-### Frontend Variables
+1.  Go to Render Dashboard -> **"New +"** -> **"Static Site"**.
+2.  Select the same repository: `Ecommerce-B-to-B`.
+3.  **Name**: `b2b-frontend` (or similar).
+4.  **Root Directory**: `frontend`.
+5.  **Build Command**: `npm run build`.
+6.  **Publish Directory**: `dist`.
+7.  **Environment Variables**:
+    - `VITE_API_BASE_URL`: Paste the **backend URL** from Phase 2 (e.g., `https://b2b-backend.onrender.com/api`).
+8.  Click **"Create Static Site"**.
+9.  Wait for deployment. Once live, click the link to see your website!
+10. **Final Step**: Go back to your Backend Web Service -> Environment Variables, and update `CORS_ALLOWED_ORIGINS` to your new **Frontend URL** (e.g., `https://b2b-frontend.onrender.com`).
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `VITE_API_BASE_URL` | Full URL to your backend API | `http://localhost:8080/api` |
+## 🎉 Done!
 
-> [!IMPORTANT]
-> The `VITE_API_BASE_URL` must be set **at build time** for the frontend. If you are using Docker Compose, you might need to adjust how this is passed or rebuild the image with the correct ARG.
-
-## Deployment Method: Docker Compose (Recommended)
-
-1.  **Clone the repository** to your server.
-2.  **Create a `.env` file** in the root directory with your production values:
-    ```env
-    DB_USERNAME=your_db_user
-    DB_PASSWORD=your_db_password
-    SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/B2BEcom
-    JWT_SECRET=your_secure_random_secre_key_minimum_256_bits
-    CORS_ALLOWED_ORIGINS=http://your-frontend-domain.com
-    ```
-3.  **Run the application**:
-    ```bash
-    docker-compose up -d --build
-    ```
-
-## Deployment Method: Cloud Platforms (Render, Railway, etc.)
-
-### Backend
-1.  Connect your GitHub repository.
-2.  Select `spring_boot_mvc_template` as the specific root directory.
-3.  Add the **Environment Variables** listed above.
-4.  The provided `Dockerfile` will handle the build and run process.
-
-### Frontend
-1.  Connect your GitHub repository.
-2.  Select `frontend` as the root directory.
-3.  Add `VITE_API_BASE_URL` to the **Environment Variables** (set to your deployed Backend URL).
-4.  The provided `Dockerfile` serves the app using Nginx.
-
-## Troubleshooting
-
-### CORS Issues
-If you see "CORS error" in the browser console:
-- Check that `CORS_ALLOWED_ORIGINS` in the backend includes your frontend's domain (e.g., `https://myapp.com`).
-- Ensure the frontend is calling the correct `VITE_API_BASE_URL`.
-
-### Database Connection Failures
-- Verify `SPRING_DATASOURCE_URL` is correct.
-- Ensure the database server is running and accessible from the backend container.
-- If using Docker Compose, the hostname for the database is `db` (as defined in `docker-compose.yml`).
-
-### Build Failures
-- **Backend**: Ensure Maven options are correct. The Dockerfile skips tests (`-DskipTests`) to speed up builds.
-- **Frontend**: Check for linting errors. The build command `npm run build` will fail if there are TypeScript or ESLint errors.
+You now have two links:
+- **Frontend Link**: This is what you put on your resume!
+- **Backend Link**: API endpoint (for reference).
